@@ -1,12 +1,14 @@
 package com.schedulerapp.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 public class HelloController {
+
     @GetMapping("/")
     public String home() {
-        return "Hello";
+        return "index"; // Odnosi się do pliku index.html w templates
     }
 }
+
