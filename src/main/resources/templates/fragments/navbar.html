@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="navbar">
+<body>
+<nav>
+    <ul>
+        <li th:if="${#authentication.authenticated}">
+            Witaj, <span th:text="${#authentication.name}">User</span>
+        </li>
+        <li th:if="${!#authentication.authenticated}">
+            Witaj, Gość
+        </li>
+
+        <!-- Wylogowanie -->
+        <li th:if="${#authentication != null}">
+            <a th:href="@{/logout}" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">
+                Wyloguj się
+            </a>
+        </li>
+
+        <!-- Link dla administratora -->
+        <li th:if="${#authorization != null and #authorization.expression('hasRole(''ADMIN'')')}">
+            <a th:href="@{/admin/users}">Panel użytkowników</a>
+        </li>
+    </ul>
+
+    <!-- Formularz wylogowania -->
+    <form id="logoutForm" th:action="@{/logout}" method="post" style="display:none;">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    </form>
+</nav>
+</body>
+</html>
