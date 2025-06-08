@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Add User</title>
+  <title>Dodaj Użytkownika</title>
 </head>
 <body>
 
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<h1>Add User</h1>
+<h1>Dodaj Użytkownika</h1>
+
+<!-- Sekcja wyświetlania błędów -->
+<div th:if="${error != null}" style="color: red; margin-bottom: 10px;">
+  <p th:text="${error}"></p>
+</div>
+
 <form th:action="@{/admin/add-user}" th:object="${user}" method="post">
-  <label for="username">Username:</label>
+  <label for="username">Nazwa:</label>
   <input type="text" id="username" th:field="*{username}" required/><br/>
-  <label for="password">Password:</label>
+  <label for="password">Hasło:</label>
   <input type="password" id="password" th:field="*{password}" required/><br/>
-  <label for="role">Role:</label>
+  <label for="role">Rola:</label>
   <select id="role" th:field="*{role}">
-    <option value="ROLE_USER">User</option>
+    <option value="ROLE_USER">Użytkownik</option>
     <option value="ROLE_ADMIN">Admin</option>
   </select><br/>
-  <button type="submit">Add User</button>
+  <button type="submit">Dodaj</button>
 </form>
 
 </body>

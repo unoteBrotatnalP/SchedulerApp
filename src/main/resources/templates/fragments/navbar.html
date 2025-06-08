@@ -4,11 +4,9 @@
 <nav>
     <ul>
         <li th:if="${#authentication.authenticated}">
-            Witaj, <span th:text="${#authentication.name}">User</span>
+            <span th:text="${#authentication.name}">User</span>
         </li>
-        <li th:if="${!#authentication.authenticated}">
-            Witaj, Gość
-        </li>
+
 
         <!-- Wylogowanie -->
         <li th:if="${#authentication != null}">
@@ -16,6 +14,8 @@
                 Wyloguj się
             </a>
         </li>
+
+        <li><a th:href="@{/}">Home</a></li>
 
         <!-- Link dla administratora -->
         <li th:if="${#authorization != null and #authorization.expression('hasRole(''ADMIN'')')}">

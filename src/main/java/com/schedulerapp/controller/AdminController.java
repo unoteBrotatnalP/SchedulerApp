@@ -3,10 +3,12 @@ package com.schedulerapp.controller;
 import com.schedulerapp.model.User;
 import com.schedulerapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -31,9 +33,43 @@ public class AdminController {
     }
 
     @PostMapping("/admin/add-user")
-    public String addUser(User user) {
+    public String addUser(User user, Model model) {
+        // Sprawdź, czy użytkownik o podanej nazwie już istnieje
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            model.addAttribute("error", "Już istnieje taki użytkownik.");
+            model.addAttribute("user", user); // Zachowaj dane wprowadzone w formularzu
+            return "add-user"; // Powrót do formularza
+        }
+
+        // Koduj hasło i zapisz nowego użytkownika
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+
+        return "redirect:/admin/users";
+    }
+
+    @GetMapping("/admin/delete-user/{id}")
+    public String deleteUser(@PathVariable Long id, Authentication authentication, Model model) {
+        // Pobierz aktualnie zalogowanego użytkownika
+        String loggedInUsername = authentication.getName();
+
+        // Znajdź użytkownika do usunięcia
+        User userToDelete = userRepository.findById(id).orElse(null);
+
+        if (userToDelete == null) {
+            model.addAttribute("error", "User not found.");
+            return "error"; // Stwórz widok błędu
+        }
+
+        // Sprawdź, czy użytkownik próbuje usunąć samego siebie
+        if (userToDelete.getUsername().equals(loggedInUsername)) {
+            model.addAttribute("error", "You cannot delete your own account.");
+            return "error"; // Stwórz widok błędu
+        }
+
+        // Usuń użytkownika
+        userRepository.delete(userToDelete);
+
         return "redirect:/admin/users";
     }
 }
