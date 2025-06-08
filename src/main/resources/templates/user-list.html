@@ -8,13 +8,17 @@
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <h1>User List</h1>
-<table>
+<table border="1" cellspacing="0" cellpadding="5">
   <thead>
   <tr>
     <th>ID</th>
     <th>Nazwa</th>
     <th>Rola</th>
-    <th>-</th>
+    <th>Imię</th>
+    <th>Nazwisko</th>
+    <th>Data zatrudnienia</th>
+    <th>Stanowisko</th>
+    <th>Akcje</th>
   </tr>
   </thead>
   <tbody>
@@ -22,7 +26,12 @@
     <td th:text="${user.id}"></td>
     <td th:text="${user.username}"></td>
     <td th:text="${user.role}"></td>
+    <td th:text="${user.firstName}"></td>
+    <td th:text="${user.lastName}"></td>
+    <td th:text="${user.employmentDate}"></td>
+    <td th:text="${user.jobTitle}"></td>
     <td>
+      <a th:href="@{/admin/edit-user/{id}(id=${user.id})}">Edytuj</a> |
       <a th:href="@{/admin/delete-user/{id}(id=${user.id})}"
          onclick="return confirm('Czy jesteś pewien, że chcesz usunąć tego użytkownika?')">
         Usuń

@@ -9,7 +9,6 @@
 
 <h1>Dodaj Użytkownika</h1>
 
-<!-- Sekcja wyświetlania błędów -->
 <div th:if="${error != null}" style="color: red; margin-bottom: 10px;">
   <p th:text="${error}"></p>
 </div>
@@ -17,13 +16,28 @@
 <form th:action="@{/admin/add-user}" th:object="${user}" method="post">
   <label for="username">Nazwa:</label>
   <input type="text" id="username" th:field="*{username}" required/><br/>
+
   <label for="password">Hasło:</label>
   <input type="password" id="password" th:field="*{password}" required/><br/>
+
   <label for="role">Rola:</label>
   <select id="role" th:field="*{role}">
     <option value="ROLE_USER">Użytkownik</option>
     <option value="ROLE_ADMIN">Admin</option>
   </select><br/>
+
+  <label for="firstName">Imię:</label>
+  <input type="text" id="firstName" th:field="*{firstName}" required/><br/>
+
+  <label for="lastName">Nazwisko:</label>
+  <input type="text" id="lastName" th:field="*{lastName}" required/><br/>
+
+  <label for="employmentDate">Data zatrudnienia:</label>
+  <input type="date" id="employmentDate" th:field="*{employmentDate}" required/><br/>
+
+  <label for="jobTitle">Stanowisko:</label>
+  <input type="text" id="jobTitle" th:field="*{jobTitle}" required/><br/>
+
   <button type="submit">Dodaj</button>
 </form>
 

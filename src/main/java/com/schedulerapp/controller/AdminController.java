@@ -34,42 +34,79 @@ public class AdminController {
 
     @PostMapping("/admin/add-user")
     public String addUser(User user, Model model) {
-        // Sprawdź, czy użytkownik o podanej nazwie już istnieje
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             model.addAttribute("error", "Już istnieje taki użytkownik.");
-            model.addAttribute("user", user); // Zachowaj dane wprowadzone w formularzu
-            return "add-user"; // Powrót do formularza
+            model.addAttribute("user", user);
+            return "add-user";
         }
 
-        // Koduj hasło i zapisz nowego użytkownika
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
 
         return "redirect:/admin/users";
     }
 
+    @GetMapping("/admin/edit-user/{id}")
+    public String showEditUserForm(@PathVariable Long id, Model model) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            model.addAttribute("error", "Użytkownik nie znaleziony.");
+            return "error";
+        }
+        model.addAttribute("user", user);
+        return "edit-user"; // nowy widok formularza edycji
+    }
+
+    @PostMapping("/admin/edit-user/{id}")
+    public String editUser(@PathVariable Long id, User updatedUser, Model model) {
+        User existingUser = userRepository.findById(id).orElse(null);
+        if (existingUser == null) {
+            model.addAttribute("error", "Użytkownik nie znaleziony.");
+            return "error";
+        }
+
+        // Sprawdź, czy nazwa użytkownika nie koliduje z innym użytkownikiem
+        userRepository.findByUsername(updatedUser.getUsername())
+                .filter(u -> !u.getId().equals(id))
+                .ifPresent(u -> {
+                    model.addAttribute("error", "Nazwa użytkownika jest już zajęta.");
+                    model.addAttribute("user", updatedUser);
+                });
+
+        // Aktualizuj pola
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setRole(updatedUser.getRole());
+        existingUser.setFirstName(updatedUser.getFirstName());
+        existingUser.setLastName(updatedUser.getLastName());
+        existingUser.setEmploymentDate(updatedUser.getEmploymentDate());
+        existingUser.setJobTitle(updatedUser.getJobTitle());
+
+        // Jeśli hasło zostało podane (niepuste), zakoduj i ustaw nowe
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
+            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
+
+        userRepository.save(existingUser);
+
+        return "redirect:/admin/users";
+    }
+
     @GetMapping("/admin/delete-user/{id}")
     public String deleteUser(@PathVariable Long id, Authentication authentication, Model model) {
-        // Pobierz aktualnie zalogowanego użytkownika
         String loggedInUsername = authentication.getName();
-
-        // Znajdź użytkownika do usunięcia
         User userToDelete = userRepository.findById(id).orElse(null);
 
         if (userToDelete == null) {
-            model.addAttribute("error", "User not found.");
-            return "error"; // Stwórz widok błędu
+            model.addAttribute("error", "Użytkownik nie znaleziony.");
+            return "error";
         }
 
-        // Sprawdź, czy użytkownik próbuje usunąć samego siebie
         if (userToDelete.getUsername().equals(loggedInUsername)) {
-            model.addAttribute("error", "You cannot delete your own account.");
-            return "error"; // Stwórz widok błędu
+            model.addAttribute("error", "Nie możesz usunąć własnego konta.");
+            return "error";
         }
 
-        // Usuń użytkownika
         userRepository.delete(userToDelete);
-
         return "redirect:/admin/users";
     }
 }

@@ -1,11 +1,10 @@
 package com.schedulerapp.model;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import java.time.LocalDate;
 
 @Entity
 public class User {
@@ -20,7 +19,16 @@ public class User {
 
     private String role;
 
+    private String firstName;
+
+    private String lastName;
+
+    private LocalDate employmentDate;
+
+    private String jobTitle;
+
     // Gettery i settery
+
     public Long getId() {
         return id;
     }
@@ -51,5 +59,37 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public LocalDate getEmploymentDate() {
+        return employmentDate;
+    }
+
+    public void setEmploymentDate(LocalDate employmentDate) {
+        this.employmentDate = employmentDate;
+    }
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 }
