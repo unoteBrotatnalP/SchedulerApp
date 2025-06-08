@@ -21,14 +21,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests()
-                // Zezwól na dostęp do strony logowania i zasobów statycznych bez uwierzytelniania
-                .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
+                .requestMatchers("/", "/grafik", "/dyspozycja").authenticated()
+                .anyRequest().permitAll()
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                .defaultSuccessUrl("/admin/users", true)
+                .defaultSuccessUrl("/", true)
                 .permitAll()
                 .and()
                 .logout()
@@ -41,11 +40,17 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return username -> userRepository.findByUsername(username)
-                .map(user -> org.springframework.security.core.userdetails.User.builder()
-                        .username(user.getUsername())
-                        .password(user.getPassword())
-                        .roles(user.getRole().replace("ROLE_", ""))
-                        .build())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .map(user -> {
+                    System.out.println("Loaded user: " + user.getUsername() + " with role: " + user.getRole());
+                    return org.springframework.security.core.userdetails.User.builder()
+                            .username(user.getUsername())
+                            .password(user.getPassword())
+                            .roles(user.getRole().replace("ROLE_", ""))
+                            .build();
+                })
+                .orElseThrow(() -> {
+                    System.out.println("User not found: " + username);
+                    return new RuntimeException("User not found");
+                });
     }
 }
