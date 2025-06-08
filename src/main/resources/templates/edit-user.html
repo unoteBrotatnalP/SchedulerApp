@@ -33,7 +33,8 @@
   <input type="text" id="lastName" th:field="*{lastName}" /><br/>
 
   <label for="employmentDate">Data zatrudnienia:</label>
-  <input type="date" id="employmentDate" th:field="*{employmentDate}" /><br/>
+  <input type="date" id="employmentDate" name="employmentDate"
+         th:value="${user.employmentDate != null} ? ${user.employmentDate} : ''" /><br/>
 
   <label for="jobTitle">Stanowisko:</label>
   <input type="text" id="jobTitle" th:field="*{jobTitle}" /><br/>
