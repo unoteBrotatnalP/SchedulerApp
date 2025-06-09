@@ -10,9 +10,4 @@ public class PageController {
     public String grafik() {
         return "grafik"; // Odnosi się do pliku grafik.html
     }
-
-    @GetMapping("/dyspozycja")
-    public String dyspozycja() {
-        return "dyspozycja"; // Odnosi się do pliku dyspozycja.html
-    }
 }
