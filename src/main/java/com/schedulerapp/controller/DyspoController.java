@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Controller
 public class DyspoController {
@@ -43,12 +43,18 @@ public class DyspoController {
 
         String currentUsername = authentication.getName();
 
-        Map<Long, Boolean> userDyspoMap = dyspoList.stream()
-                .collect(Collectors.toMap(
-                        Dyspo::getId,
-                        dyspo -> dyspo.getUserDyspoEntries().stream()
-                                .anyMatch(entry -> entry.getUser().getUsername().equals(currentUsername))
-                ));
+        User user = userRepository.findByUsername(currentUsername)
+                .orElse(null);
+
+        Map<Long, UserDyspo> userDyspoMap = new HashMap<>();
+        if (user != null) {
+            List<UserDyspo> userDyspoList = userDyspoRepository.findByUser(user);
+            for (UserDyspo ud : userDyspoList) {
+                if (ud.getDyspo() != null) {
+                    userDyspoMap.put(ud.getDyspo().getId(), ud);
+                }
+            }
+        }
         model.addAttribute("userDyspoMap", userDyspoMap);
 
         return "dyspozycja";
