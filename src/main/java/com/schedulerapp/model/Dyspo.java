@@ -1,11 +1,9 @@
 package com.schedulerapp.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Dyspo {
@@ -15,6 +13,16 @@ public class Dyspo {
     private Long id;
 
     private LocalDate date;
+
+    @ManyToMany
+    @JoinTable(
+            name = "dyspo_users",
+            joinColumns = @JoinColumn(name = "dyspo_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> users = new HashSet<>();
+
+    // Gettery i settery
 
     public Long getId() {
         return id;
@@ -30,5 +38,13 @@ public class Dyspo {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 }

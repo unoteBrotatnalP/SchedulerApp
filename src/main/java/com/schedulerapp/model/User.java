@@ -1,10 +1,9 @@
 package com.schedulerapp.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class User {
@@ -14,18 +13,15 @@ public class User {
     private Long id;
 
     private String username;
-
     private String password;
-
     private String role;
-
     private String firstName;
-
     private String lastName;
-
     private LocalDate employmentDate;
-
     private String jobTitle;
+
+    @ManyToMany(mappedBy = "users")
+    private Set<Dyspo> dyspozycje = new HashSet<>();
 
     // Gettery i settery
 
@@ -91,5 +87,13 @@ public class User {
 
     public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
+    }
+
+    public Set<Dyspo> getDyspozycje() {
+        return dyspozycje;
+    }
+
+    public void setDyspozycje(Set<Dyspo> dyspozycje) {
+        this.dyspozycje = dyspozycje;
     }
 }
