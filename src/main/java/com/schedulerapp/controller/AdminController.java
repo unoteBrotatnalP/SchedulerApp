@@ -1,38 +1,45 @@
 package com.schedulerapp.controller;
 
+import com.schedulerapp.model.Dyspo;
 import com.schedulerapp.model.User;
+import com.schedulerapp.repository.DyspoRepository;
 import com.schedulerapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.Optional;
 
 @Controller
+@RequestMapping("/admin")
 public class AdminController {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
+    private DyspoRepository dyspoRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @GetMapping("/admin/users")
+    @GetMapping("/users")
     public String listUsers(Model model) {
         model.addAttribute("users", userRepository.findAll());
         return "user-list";
     }
 
-    @GetMapping("/admin/add-user")
+    @GetMapping("/add-user")
     public String showAddUserForm(Model model) {
         model.addAttribute("user", new User());
         return "add-user";
     }
 
-    @PostMapping("/admin/add-user")
+    @PostMapping("/add-user")
     public String addUser(User user, Model model) {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             model.addAttribute("error", "Już istnieje taki użytkownik.");
@@ -46,7 +53,7 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    @GetMapping("/admin/edit-user/{id}")
+    @GetMapping("/edit-user/{id}")
     public String showEditUserForm(@PathVariable Long id, Model model) {
         User user = userRepository.findById(id).orElse(null);
         if (user == null) {
@@ -54,10 +61,10 @@ public class AdminController {
             return "error";
         }
         model.addAttribute("user", user);
-        return "edit-user"; // nowy widok formularza edycji
+        return "edit-user";
     }
 
-    @PostMapping("/admin/edit-user/{id}")
+    @PostMapping("/edit-user/{id}")
     public String editUser(@PathVariable Long id, User updatedUser, Model model) {
         User existingUser = userRepository.findById(id).orElse(null);
         if (existingUser == null) {
@@ -65,7 +72,6 @@ public class AdminController {
             return "error";
         }
 
-        // Sprawdź, czy nazwa użytkownika nie koliduje z innym użytkownikiem
         userRepository.findByUsername(updatedUser.getUsername())
                 .filter(u -> !u.getId().equals(id))
                 .ifPresent(u -> {
@@ -73,7 +79,6 @@ public class AdminController {
                     model.addAttribute("user", updatedUser);
                 });
 
-        // Aktualizuj pola
         existingUser.setUsername(updatedUser.getUsername());
         existingUser.setRole(updatedUser.getRole());
         existingUser.setFirstName(updatedUser.getFirstName());
@@ -81,7 +86,6 @@ public class AdminController {
         existingUser.setEmploymentDate(updatedUser.getEmploymentDate());
         existingUser.setJobTitle(updatedUser.getJobTitle());
 
-        // Jeśli hasło zostało podane (niepuste), zakoduj i ustaw nowe
         if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
             existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
@@ -91,7 +95,7 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    @GetMapping("/admin/delete-user/{id}")
+    @GetMapping("/delete-user/{id}")
     public String deleteUser(@PathVariable Long id, Authentication authentication, Model model) {
         String loggedInUsername = authentication.getName();
         User userToDelete = userRepository.findById(id).orElse(null);
@@ -108,5 +112,25 @@ public class AdminController {
 
         userRepository.delete(userToDelete);
         return "redirect:/admin/users";
+    }
+
+    @PostMapping("/generate-dyspo")
+    public String generateDyspo(@RequestParam int month, @RequestParam int year, Model model) {
+        try {
+            // Logika generowania dyspozycji dla każdego dnia miesiąca
+            LocalDate date = LocalDate.of(year, month, 1);
+            int daysInMonth = date.lengthOfMonth();
+
+            for (int day = 1; day <= daysInMonth; day++) {
+                Dyspo dyspo = new Dyspo();
+                dyspo.setDate(LocalDate.of(year, month, day));
+                dyspoRepository.save(dyspo);
+            }
+            model.addAttribute("success", "Dyspozycje zostały wygenerowane.");
+        } catch (Exception e) {
+            model.addAttribute("error", "Wystąpił problem podczas generowania dyspozycji.");
+        }
+
+        return "redirect:/dyspozycja";
     }
 }

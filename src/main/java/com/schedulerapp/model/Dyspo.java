@@ -14,13 +14,8 @@ public class Dyspo {
 
     private LocalDate date;
 
-    @ManyToMany
-    @JoinTable(
-            name = "dyspo_users",
-            joinColumns = @JoinColumn(name = "dyspo_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "dyspo", cascade = CascadeType.ALL)
+    private Set<UserDyspo> userDyspoEntries = new HashSet<>();
 
     // Gettery i settery
 
@@ -40,11 +35,11 @@ public class Dyspo {
         this.date = date;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public Set<UserDyspo> getUserDyspoEntries() {
+        return userDyspoEntries;
     }
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
+    public void setUserDyspoEntries(Set<UserDyspo> userDyspoEntries) {
+        this.userDyspoEntries = userDyspoEntries;
     }
 }

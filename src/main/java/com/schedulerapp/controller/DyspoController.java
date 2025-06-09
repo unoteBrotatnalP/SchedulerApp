@@ -1,7 +1,11 @@
 package com.schedulerapp.controller;
 
 import com.schedulerapp.model.Dyspo;
+import com.schedulerapp.model.User;
+import com.schedulerapp.model.UserDyspo;
 import com.schedulerapp.repository.DyspoRepository;
+import com.schedulerapp.repository.UserDyspoRepository;
+import com.schedulerapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -10,9 +14,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 public class DyspoController {
@@ -20,27 +26,85 @@ public class DyspoController {
     @Autowired
     private DyspoRepository dyspoRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserDyspoRepository userDyspoRepository;
+
     @GetMapping("/dyspozycja")
-    public String dyspozycja(Model model, Authentication authentication) {
-        model.addAttribute("dyspoList", dyspoRepository.findAll());
-        model.addAttribute("isAdmin", authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN")));
+    public String getDyspozycja(Model model, Authentication authentication) {
+        List<Dyspo> dyspoList = dyspoRepository.findAll();
+        model.addAttribute("dyspoList", dyspoList);
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+        model.addAttribute("isAdmin", isAdmin);
+
+        String currentUsername = authentication.getName();
+
+        Map<Long, Boolean> userDyspoMap = dyspoList.stream()
+                .collect(Collectors.toMap(
+                        Dyspo::getId,
+                        dyspo -> dyspo.getUserDyspoEntries().stream()
+                                .anyMatch(entry -> entry.getUser().getUsername().equals(currentUsername))
+                ));
+        model.addAttribute("userDyspoMap", userDyspoMap);
+
         return "dyspozycja";
     }
 
-    @PostMapping("/admin/generate-dyspo")
-    public String generateDyspo(@RequestParam int year, @RequestParam int month, Model model) {
-        LocalDate startDate = LocalDate.of(year, month, 1);
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+    @PostMapping("/dyspo/add")
+    public String addUserToDyspo(@RequestParam Long dyspoId, Authentication authentication) {
+        Optional<Dyspo> optionalDyspo = dyspoRepository.findById(dyspoId);
+        if (optionalDyspo.isPresent()) {
+            Dyspo dyspo = optionalDyspo.get();
+            User user = userRepository.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<Dyspo> newDyspoEntries = new ArrayList<>();
-        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            Dyspo dyspo = new Dyspo();
-            dyspo.setDate(date);
-            newDyspoEntries.add(dyspo);
+            if (userDyspoRepository.findByDyspoAndUser(dyspo, user).isEmpty()) {
+                UserDyspo userDyspo = new UserDyspo();
+                userDyspo.setDyspo(dyspo);
+                userDyspo.setUser(user);
+                userDyspoRepository.save(userDyspo);
+            }
         }
+        return "redirect:/dyspozycja";
+    }
 
-        dyspoRepository.saveAll(newDyspoEntries);
+    @PostMapping("/dyspo/remove")
+    public String removeUserFromDyspo(@RequestParam Long dyspoId, Authentication authentication) {
+        Optional<Dyspo> optionalDyspo = dyspoRepository.findById(dyspoId);
+        if (optionalDyspo.isPresent()) {
+            Dyspo dyspo = optionalDyspo.get();
+            User user = userRepository.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            userDyspoRepository.findByDyspoAndUser(dyspo, user)
+                    .ifPresent(userDyspoRepository::delete);
+        }
+        return "redirect:/dyspozycja";
+    }
+
+    @PostMapping("/dyspo/add-hour")
+    public String setStartHour(@RequestParam Long dyspoId, @RequestParam String startHour, Authentication authentication) {
+        Optional<Dyspo> optionalDyspo = dyspoRepository.findById(dyspoId);
+        if (optionalDyspo.isPresent()) {
+            Dyspo dyspo = optionalDyspo.get();
+            User user = userRepository.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            UserDyspo userDyspo = userDyspoRepository.findByDyspoAndUser(dyspo, user)
+                    .orElseGet(() -> {
+                        UserDyspo newUserDyspo = new UserDyspo();
+                        newUserDyspo.setDyspo(dyspo);
+                        newUserDyspo.setUser(user);
+                        return newUserDyspo;
+                    });
+
+            userDyspo.setStartHour(LocalTime.parse(startHour));
+            userDyspoRepository.save(userDyspo);
+        }
         return "redirect:/dyspozycja";
     }
 }

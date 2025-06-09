@@ -20,8 +20,10 @@ public class User {
     private LocalDate employmentDate;
     private String jobTitle;
 
-    @ManyToMany(mappedBy = "users")
-    private Set<Dyspo> dyspozycje = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<UserDyspo> userDyspoEntries = new HashSet<>();
+
+
 
     // Gettery i settery
 
@@ -89,11 +91,13 @@ public class User {
         this.jobTitle = jobTitle;
     }
 
-    public Set<Dyspo> getDyspozycje() {
-        return dyspozycje;
+    public Set<UserDyspo> getUserDyspoEntries() {
+        return userDyspoEntries;
     }
 
-    public void setDyspozycje(Set<Dyspo> dyspozycje) {
-        this.dyspozycje = dyspozycje;
+    public void setUserDyspoEntries(Set<UserDyspo> userDyspoEntries) {
+        this.userDyspoEntries = userDyspoEntries;
     }
+
+
 }

@@ -1,9 +1,31 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dyspozycja</title>
+    <style>
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin: 20px;
+        }
+
+        .day {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        .day .buttons {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+    </style>
 </head>
 <body>
 
@@ -23,20 +45,32 @@
     </form>
 </div>
 
-<table border="1" cellspacing="0" cellpadding="5">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Data</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="dyspo : ${dyspoList}">
-        <td th:text="${dyspo.id}"></td>
-        <td th:text="${dyspo.date}"></td>
-    </tr>
-    </tbody>
-</table>
+<div th:if="${#lists.isEmpty(dyspoList)}">
+    <p>Brak dostępnych dyspozycji. Skorzystaj z przycisku powyżej, aby je wygenerować.</p>
+</div>
+
+<div class="calendar" th:if="${!#lists.isEmpty(dyspoList)}">
+    <div class="day" th:each="dyspo : ${dyspoList}">
+        <div th:text="${dyspo.date}"></div>
+        <div class="buttons">
+            <form th:action="@{/dyspo/add}" method="post" th:if="${!userDyspoMap[dyspo.id]}">
+                <input type="hidden" name="dyspoId" th:value="${dyspo.id}" />
+                <button type="submit">+</button>
+            </form>
+
+            <form th:action="@{/dyspo/remove}" method="post" th:if="${userDyspoMap[dyspo.id]}">
+                <input type="hidden" name="dyspoId" th:value="${dyspo.id}" />
+                <button type="submit">-</button>
+            </form>
+
+            <form th:action="@{/dyspo/add-hour}" method="post">
+                <input type="hidden" name="dyspoId" th:value="${dyspo.id}" />
+                <input type="time" name="startHour" />
+                <button type="submit">/</button>
+            </form>
+        </div>
+    </div>
+</div>
 
 <a href="/">Home</a>
 
