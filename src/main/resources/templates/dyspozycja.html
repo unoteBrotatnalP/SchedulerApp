@@ -48,6 +48,11 @@
         <input type="number" id="year" name="year" min="2000" max="2100" required />
 
         <button type="submit">Generuj dyspozycje</button>
+
+    </form>
+
+    <form th:action="@{/admin/clear-dyspo}" method="post" style="display: inline;">
+        <button type="submit" style="background-color: red; color: white;">Usuń wszystkie</button>
     </form>
 </div>
 

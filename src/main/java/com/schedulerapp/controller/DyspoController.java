@@ -113,4 +113,11 @@ public class DyspoController {
         }
         return "redirect:/dyspozycja";
     }
+
+    @PostMapping("/admin/clear-dyspo")
+    public String clearDyspo() {
+        userDyspoRepository.deleteAll();
+        dyspoRepository.deleteAll();
+        return "redirect:/dyspozycja";
+    }
 }
