@@ -5,11 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dyspozycja</title>
     <style>
+        .calendar-container {
+            display: grid;
+            grid-template-rows: auto auto;
+            margin: 20px;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
         .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 10px;
-            margin: 20px;
+        }
+
+        .empty {
+            visibility: hidden;
         }
 
         .day {
@@ -39,6 +56,7 @@
 
 <h1>Dyspozycja</h1>
 
+<!-- Panel administracyjny -->
 <div th:if="${isAdmin}">
     <form th:action="@{/admin/generate-dyspo}" method="post">
         <label for="month">Miesiąc:</label>
@@ -48,7 +66,6 @@
         <input type="number" id="year" name="year" min="2000" max="2100" required />
 
         <button type="submit">Generuj dyspozycje</button>
-
     </form>
 
     <form th:action="@{/admin/clear-dyspo}" method="post" style="display: inline;">
@@ -56,34 +73,59 @@
     </form>
 </div>
 
+<!-- Informacja o braku dyspozycji -->
 <div th:if="${#lists.isEmpty(dyspoList)}">
     <p>Brak dostępnych dyspozycji. Skorzystaj z przycisku powyżej, aby je wygenerować.</p>
 </div>
 
-<div th:each="dyspo : ${dyspoList}" class="day">
-    <div th:text="${dyspo.date}"></div>
-
-    <div class="start-hour" th:if="${userDyspoMap[dyspo.id] != null and userDyspoMap[dyspo.id].startHour != null}">
+<!-- Kalendarz -->
+<div th:if="${!#lists.isEmpty(dyspoList)}" class="calendar-container">
+    <!-- Pasek z dniami tygodnia -->
+    <div class="weekdays">
+        <div>Poniedziałek</div>
+        <div>Wtorek</div>
+        <div>Środa</div>
+        <div>Czwartek</div>
+        <div>Piątek</div>
+        <div>Sobota</div>
+        <div>Niedziela</div>
     </div>
 
-    <div class="buttons">
-        <form th:action="@{/dyspo/add}" method="post" th:if="${userDyspoMap[dyspo.id] == null}">
-            <input type="hidden" name="dyspoId" th:value="${dyspo.id}" />
-            <button type="submit">+</button>
-        </form>
+    <!-- Siatka kalendarza -->
+    <div class="calendar">
+        <!-- Puste pola dla dni przed rozpoczęciem miesiąca -->
+        <div class="empty" th:each="i : ${#numbers.sequence(1, startDayOffset)}"></div>
 
-        <form th:action="@{/dyspo/remove}" method="post" th:if="${userDyspoMap[dyspo.id] != null}">
-            <input type="hidden" name="dyspoId" th:value="${dyspo.id}" />
-            <button type="submit">-</button>
-        </form>
+        <!-- Dni miesiąca -->
+        <div th:each="dyspo : ${dyspoList}" class="day">
+            <div th:text="${dyspo.date}"></div>
 
-        <form th:action="@{/dyspo/add-hour}" method="post">
-            <input type="hidden" name="dyspoId" th:value="${dyspo.id}" />
-            <input type="time" name="startHour"
-                   th:value="${userDyspoMap[dyspo.id] != null ? userDyspoMap[dyspo.id].startHour : ''}"
-                    />
-            <button type="submit">/</button>
-        </form>
+            <div class="start-hour" th:if="${userDyspoMap[dyspo.id] != null and userDyspoMap[dyspo.id].startHour != null}">
+                <span th:text="${userDyspoMap[dyspo.id].startHour}"></span>
+            </div>
+
+            <div class="buttons">
+                <!-- Dodanie dyspozycji -->
+                <form th:action="@{/dyspo/add}" method="post" th:if="${userDyspoMap[dyspo.id] == null}">
+                    <input type="hidden" name="dyspoId" th:value="${dyspo.id}" />
+                    <button type="submit">+</button>
+                </form>
+
+                <!-- Usunięcie dyspozycji -->
+                <form th:action="@{/dyspo/remove}" method="post" th:if="${userDyspoMap[dyspo.id] != null}">
+                    <input type="hidden" name="dyspoId" th:value="${dyspo.id}" />
+                    <button type="submit">-</button>
+                </form>
+
+                <!-- Dodanie godziny -->
+                <form th:action="@{/dyspo/add-hour}" method="post">
+                    <input type="hidden" name="dyspoId" th:value="${dyspo.id}" />
+                    <input type="time" name="startHour"
+                           th:value="${userDyspoMap[dyspo.id] != null ? userDyspoMap[dyspo.id].startHour : ''}" />
+                    <button type="submit">/</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
