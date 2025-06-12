@@ -6,150 +6,118 @@
     <title>Podsumowanie Dyspozycji</title>
     <style>
         .summary-container {
-          max-width: 600px;
-          margin: 20px auto;
-          font-family: Arial, sans-serif;
-          background: #f9f9f9;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         .summary-container h3 {
-          color: #333;
-          border-bottom: 2px solid #4CAF50;
-          padding-bottom: 5px;
-          margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
         }
 
         .summary-container p {
-          font-size: 16px;
-          margin: 6px 0;
-          color: #555;
+            font-size: 16px;
+            margin: 6px 0;
+            color: #555;
         }
 
         .shifts-list {
-          list-style-type: none;
-          padding-left: 0;
-          margin-top: 20px;
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 20px;
         }
 
         .shifts-list li {
-          background: #fff;
-          padding: 10px 15px;
-          margin-bottom: 10px;
-          border-left: 5px solid #4CAF50;
-          border-radius: 4px;
-        }
-
-        .shifts-list li p {
-          margin: 4px 0;
+            background: #fff;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid #4CAF50;
+            border-radius: 4px;
         }
 
         .admin-container {
-    max-width: 700px;
-    margin: 20px auto;
-    font-family: Arial, sans-serif;
-    background: #eef6fb;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
+            max-width: 700px;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+            background: #eef6fb;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
 
-  .admin-container h2, .admin-container h3, .admin-container h4 {
-    color: #2a6592;
-    margin-bottom: 15px;
-  }
+        .admin-container h2 {
+            color: #2a6592;
+        }
 
-  form select {
-    padding: 6px 10px;
-    font-size: 16px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    margin-right: 10px;
-  }
+        form select {
+            padding: 6px 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
 
-  form button {
-    background-color: #2a6592;
-    color: white;
-    border: none;
-    padding: 7px 15px;
-    font-size: 16px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
+        form button {
+            background-color: #2a6592;
+            color: white;
+            border: none;
+            padding: 7px 15px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
 
-  form button:hover {
-    background-color: #1f4a6e;
-  }
-
-  .user-details p {
-    font-size: 16px;
-    margin: 6px 0;
-    color: #333;
-  }
-
-  .user-shifts-list {
-    list-style-type: none;
-    padding-left: 0;
-    margin-top: 20px;
-  }
-
-  .user-shifts-list li {
-    background: #fff;
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    border-left: 5px solid #2a6592;
-    border-radius: 4px;
-  }
-
-  .user-shifts-list li p {
-    margin: 4px 0;
-  }
+        form button:hover {
+            background-color: #1f4a6e;
+        }
 
         .calendar {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 10px;
-      margin: 20px 0;
-  }
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
 
-  .day-box {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
-      border-radius: 5px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-  }
+        .day-box {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
 
-  .day-box p {
-      margin: 5px 0;
-      font-size: 14px;
-  }
+        .day-box p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
     </style>
-
 </head>
 <body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
 <h1>Podsumowanie Dyspozycji</h1>
 
 <!-- Pasek procentowy -->
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-
 <p>Procent użytkowników, którzy złożyli dyspozycję: <span th:text="${dyspoPercentage} + '%'"></span></p>
 <div style="border: 1px solid #000; width: 100%; height: 20px;">
     <div th:style="'width: ' + ${dyspoPercentage} + '%; background-color: green; height: 100%;'"></div>
 </div>
 
-<hr />
-
-<!-- Sekcja dla użytkowników -->
+<!-- Sekcja dla użytkownika -->
 <div th:if="${!isAdmin}" class="summary-container">
     <h3>Szczegóły</h3>
     <p><strong>Preferencje:</strong> <span th:text="${userDetails.preference}"></span></p>
-    <p><strong>Preferowana ilość zmian:</strong> <span th:text="${userDetails.ShiftCount}"></span></p>
+    <p><strong>Preferowana liczba zmian:</strong> <span th:text="${userDetails.shiftCount}"></span></p>
     <p><strong>Ukończone:</strong> <span th:text="${userDetails.completed}"></span></p>
-
     <h3>Twoje dyspozycje</h3>
     <ul class="shifts-list">
         <li th:each="dyspo : ${userDyspoList}">
@@ -170,35 +138,32 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- Sekcja dla admina -->
-<div th:if="${isAdmin}" class="admin-container">
     <h2>Wybierz użytkownika</h2>
     <form th:action="@{/summary}" method="get">
         <select name="selectedUserId" required>
             <option value="" disabled selected>Wybierz użytkownika</option>
-            <option th:each="user : ${users}" th:value="${user.id}"
-                    th:text="${user.firstName + ' ' + user.lastName}"></option>
+            <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.firstName + ' ' + user.lastName}"></option>
         </select>
         <button type="submit">Pokaż szczegóły</button>
     </form>
 
-    <div th:if="${user != null}" class="user-details">
+    <div th:if="${user != null}">
         <h3>Szczegóły użytkownika: <span th:text="${user.firstName + ' ' + user.lastName}"></span></h3>
         <p><strong>Preferencje:</strong> <span th:text="${userDetails.preference}"></span></p>
-        <p><strong>Preferowana ilość zmian:</strong> <span th:text="${userDetails.ShiftCount}"></span></p>
+        <p><strong>Preferowana liczba zmian:</strong> <span th:text="${userDetails.shiftCount}"></span></p>
         <p><strong>Ukończone:</strong> <span th:text="${userDetails.completed}"></span></p>
-
-        <h4>Dyspozycje:</h4>
-        <ul class="user-shifts-list">
+        <h3>Dyspozycje:</h3>
+        <ul class="shifts-list">
             <li th:each="dyspo : ${userDyspoList}">
-                <p th:if="${dyspo.dyspo != null}"><strong>Data:</strong> <span th:text="${dyspo.dyspo.date}"></span></p>
+                <p><strong>Data:</strong> <span th:text="${dyspo.dyspo.date}"></span></p>
                 <p th:if="${dyspo.startHour != null}"><strong>Godzina startu:</strong> <span th:text="${dyspo.startHour}"></span></p>
             </li>
         </ul>
     </div>
 </div>
+
+<a href="/">Home</a>
 
 </body>
 </html>
