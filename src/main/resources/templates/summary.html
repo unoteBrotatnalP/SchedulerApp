@@ -106,6 +106,27 @@
   .user-shifts-list li p {
     margin: 4px 0;
   }
+
+        .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+  }
+
+  .day-box {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  }
+
+  .day-box p {
+      margin: 5px 0;
+      font-size: 14px;
+  }
     </style>
 
 </head>
@@ -136,6 +157,19 @@
             <p th:if="${dyspo.startHour != null}"><strong>Godzina startu:</strong> <span th:text="${dyspo.startHour}"></span></p>
         </li>
     </ul>
+</div>
+
+<!-- Sekcja dla admina -->
+<div th:if="${isAdmin}" class="admin-container">
+    <h2>Kalendarz Dyspozycji</h2>
+    <div class="calendar">
+        <div th:each="entry : ${dailyDyspoCounts}">
+            <div class="day-box">
+                <p><strong th:text="${entry.key}"></strong></p>
+                <p>Liczba dyspozycji: <span th:text="${entry.value}"></span></p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Sekcja dla admina -->

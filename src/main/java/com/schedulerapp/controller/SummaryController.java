@@ -12,6 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import java.util.List;
 
@@ -69,6 +72,16 @@ public class SummaryController {
             // Dla zwykłego użytkownika pokaż jego dane
             populateUserDetails(currentUser, model);
         }
+
+        if (isAdmin) {
+            // Oblicz liczbę dyspozycji na dzień
+            Map<LocalDate, Long> dailyDyspoCounts = userDyspoRepository.findAll().stream()
+                    .filter(dyspo -> dyspo.getDyspo() != null && dyspo.getDyspo().getDate() != null)
+                    .collect(Collectors.groupingBy(dyspo -> dyspo.getDyspo().getDate(), Collectors.counting()));
+
+            model.addAttribute("dailyDyspoCounts", dailyDyspoCounts);
+        }
+
 
         return "summary";
     }
