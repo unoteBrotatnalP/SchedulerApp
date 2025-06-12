@@ -21,6 +21,11 @@
         <li th:if="${#authorization != null and #authorization.expression('hasRole(''ADMIN'')')}">
             <a th:href="@{/admin/users}">Panel użytkowników</a>
         </li>
+
+        <!-- Link do podsumowania -->
+        <li><a th:href="@{/summary}">Podsumowanie</a>
+        </li>
+
     </ul>
 
     <!-- Formularz wylogowania -->
