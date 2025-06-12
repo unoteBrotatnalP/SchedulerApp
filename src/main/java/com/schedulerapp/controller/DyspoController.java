@@ -9,6 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -100,15 +102,10 @@ public class DyspoController {
             userDyspoRepository.findByDyspoAndUser(dyspo, user)
                     .ifPresent(userDyspoRepository::delete);
 
-            // Usuń UserDyspoDetails
-            userDetailsRepository.findByUser(user)
-                    .ifPresent(details -> {
-                        System.out.println("Deleting UserDyspoDetails with id: " + details.getId());
-                        userDetailsRepository.delete(details);
-                    });
         });
         return "redirect:/dyspozycja";
     }
+
 
     @PostMapping("/dyspo/add-hour")
     public String setStartHour(@RequestParam Long dyspoId, @RequestParam String startHour, Authentication authentication) {
@@ -167,6 +164,7 @@ public class DyspoController {
     public String clearDyspo() {
         userDyspoRepository.deleteAll();
         dyspoRepository.deleteAll();
+        userDetailsRepository.deleteAll();
         return "redirect:/dyspozycja";
     }
 }

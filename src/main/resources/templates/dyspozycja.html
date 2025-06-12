@@ -66,19 +66,21 @@
 
 <!-- Panel administracyjny -->
 <div th:if="${isAdmin}" class="admin-panel">
-    <form th:action="@{/admin/generate-dyspo}" method="post">
-        <label for="month">Miesiąc:</label>
-        <input type="number" id="month" name="month" min="1" max="12" required>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+        <form th:action="@{/admin/generate-dyspo}" method="post">
+            <label for="month">Miesiąc:</label>
+            <input type="number" id="month" name="month" min="1" max="12" required>
 
-        <label for="year">Rok:</label>
-        <input type="number" id="year" name="year" min="2000" max="2100" required>
+            <label for="year">Rok:</label>
+            <input type="number" id="year" name="year" min="2000" max="2100" required>
 
-        <button type="submit">Generuj dyspozycje</button>
-    </form>
+            <button type="submit">Generuj dyspozycje</button>
+        </form>
 
-    <form th:action="@{/admin/clear-dyspo}" method="post" style="display: inline;">
-        <button type="submit" style="background-color: red; color: white;">Usuń wszystkie</button>
-    </form>
+        <form th:action="@{/admin/clear-dyspo}" method="post" style="display: inline;">
+            <button type="submit" style="background-color: red; color: white;">Usuń wszystkie</button>
+        </form>
+    </div>
 </div>
 
 <!-- Informacja o braku dyspozycji -->
