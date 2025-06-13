@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.LinkedHashMap;
 
 @Controller
 public class SummaryController {
@@ -70,11 +71,19 @@ public class SummaryController {
                     .collect(Collectors.groupingBy(dyspo -> dyspo.getDyspo().getDate(), Collectors.counting()));
 
             List<LocalDate> allDates = generateCalendarDates(YearMonth.now());
+
             Map<LocalDate, Long> calendarDyspoCounts = allDates.stream()
-                    .collect(Collectors.toMap(date -> date, date -> dailyDyspoCounts.getOrDefault(date, 0L)));
+                    .collect(Collectors.toMap(
+                            date -> date,
+                            date -> dailyDyspoCounts.getOrDefault(date, 0L),
+                            (e1, e2) -> e1,
+                            LinkedHashMap::new  // <-- tutaj używamy LinkedHashMap, by zachować kolejność
+                    ));
 
             model.addAttribute("dailyDyspoCounts", calendarDyspoCounts);
         } else {
+
+
             populateUserDetails(currentUser, model);
 
             Set<LocalDate> userDyspoDates = userDyspoRepository.findByUser(currentUser).stream()

@@ -190,7 +190,7 @@
                 <!-- Puste pola przed pierwszym dniem miesiąca -->
                 <div class="empty" th:each="i : ${#numbers.sequence(1, startDayOffset)}"></div>
 
-                <!-- Dni miesiąca -->
+                <!-- Dni miesiąc    a -->
                 <div th:each="entry : ${dailyDyspoCounts}" class="day">
                     <div th:text="${entry.key}"></div>
                     <div>Liczba dyspozycji: <span th:text="${entry.value}"></span></div>
