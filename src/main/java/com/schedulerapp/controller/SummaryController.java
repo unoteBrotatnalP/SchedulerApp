@@ -82,13 +82,14 @@ public class SummaryController {
                     .map(dyspo -> dyspo.getDyspo().getDate())
                     .collect(Collectors.toSet());
 
-            List<LocalDate> allDates = generateCalendarDates(YearMonth.now());
-            List<LocalDate> userDyspoCalendar = allDates.stream()
-                    .filter(userDyspoDates::contains)
-                    .toList();
+            Map<LocalDate, Boolean> userDyspoCalendar = generateCalendarDates(YearMonth.now()).stream()
+                    .collect(Collectors.toMap(date -> date, userDyspoDates::contains));
 
             model.addAttribute("userDyspoCalendar", userDyspoCalendar);
         }
+
+        int startDayOffset = calculateStartDayOffset(YearMonth.now());
+        model.addAttribute("startDayOffset", startDayOffset);
 
         return "summary";
     }
@@ -105,4 +106,10 @@ public class SummaryController {
     private List<LocalDate> generateCalendarDates(YearMonth yearMonth) {
         return yearMonth.atDay(1).datesUntil(yearMonth.atEndOfMonth().plusDays(1)).toList();
     }
+
+    private int calculateStartDayOffset(YearMonth yearMonth) {
+        LocalDate firstDay = yearMonth.atDay(1);
+        return (firstDay.getDayOfWeek().getValue() % 7) - 1 < 0 ? 6 : (firstDay.getDayOfWeek().getValue() % 7) - 1;
+    }
+
 }
