@@ -10,6 +10,16 @@
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <h1>Grafik</h1>
+
+<div th:if="${isAdmin}">
+    <form th:action="@{/grafik/toggle-lock}" method="post">
+        <label>
+            <input type="checkbox" name="lock" th:checked="${isDyspoLocked}" onchange="this.form.submit()" />
+            Blokuje dyspozycje
+        </label>
+    </form>
+</div>
+
 <a href="/">Home</a>
 
 </body>
