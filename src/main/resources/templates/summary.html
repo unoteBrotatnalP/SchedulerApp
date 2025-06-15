@@ -158,9 +158,21 @@
     <!-- Sekcja dla użytkownika -->
     <div th:if="${!isAdmin}" class="summary-container">
         <h3>Szczegóły</h3>
-        <p><strong>Preferencje:</strong> <span th:text="${userDetails.preference}"></span></p>
-        <p><strong>Preferowana liczba zmian:</strong> <span th:text="${userDetails.shiftCount}"></span></p>
-        <p><strong>Ukończone:</strong> <span th:text="${userDetails.completed ? 'Tak' : 'Nie'}"></span></p>
+        <div th:if="${userDetails != null}">
+            <p><strong>Preferencje:</strong>
+                <span th:text="${userDetails.preference != null && userDetails.preference != '' ? userDetails.preference : 'Użytkownik nie podał jeszcze szczegółów'}"></span>
+            </p>
+            <p><strong>Preferowana liczba zmian:</strong>
+                <span th:text="${userDetails.shiftCount != null ? userDetails.shiftCount : 'Brak danych'}"></span>
+            </p>
+            <p><strong>Ukończone:</strong>
+                <span th:text="${userDetails.completed ? 'Tak' : 'Nie'}"></span>
+            </p>
+        </div>
+        <div th:if="${userDetails == null}">
+            <p>Nie podałeś jeszcze szczegółów.</p>
+        </div>
+
         <h3>Twoje dyspozycje</h3>
         <ul class="shifts-list">
             <li th:each="dyspo : ${userDyspoList}">
@@ -169,6 +181,7 @@
             </li>
         </ul>
     </div>
+
 
     <!-- Sekcja dla admina -->
     <div th:if="${isAdmin}" class="admin-container">
@@ -208,11 +221,25 @@
         </form>
 
         <div th:if="${user != null}">
-            <h3>Szczegóły użytkownika</h3>
+            <h3>Obecnie wybrany użytkownik:</h3>
             <p><strong>Imię i nazwisko:</strong> <span th:text="${user.firstName + ' ' + user.lastName}"></span></p>
-            <p><strong>Preferencje:</strong> <span th:text="${userDetails.preference}"></span></p>
-            <p><strong>Preferowana liczba zmian:</strong> <span th:text="${userDetails.shiftCount}"></span></p>
-            <p><strong>Ukończone:</strong> <span th:text="${userDetails.completed ? 'Tak' : 'Nie'}"></span></p>
+
+        <div th:if="${user != null}">
+            <h3>Szczegóły użytkownika</h3>
+            <div th:if="${userDetails != null}">
+                <p><strong>Preferencje:</strong>
+                    <span th:text="${userDetails.preference != null && userDetails.preference != '' ? userDetails.preference : 'Użytkownik nie podał jeszcze szczegółów'}"></span>
+                </p>
+                <p><strong>Preferowana liczba zmian:</strong>
+                    <span th:text="${userDetails.shiftCount != null ? userDetails.shiftCount : 'Brak danych'}"></span>
+                </p>
+                <p><strong>Ukończone:</strong>
+                    <span th:text="${userDetails.completed ? 'Tak' : 'Nie'}"></span>
+                </p>
+            </div>
+            <div th:if="${userDetails == null}">
+                <p>Użytkownik nie podał jeszcze szczegółów.</p>
+            </div>
             <h3>Dyspozycje:</h3>
             <ul class="shifts-list">
                 <li th:each="dyspo : ${userDyspoList}">
