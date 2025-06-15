@@ -1,8 +1,10 @@
 package com.schedulerapp.controller;
 
+import com.schedulerapp.model.Dyspo;
 import com.schedulerapp.model.User;
 import com.schedulerapp.model.UserDyspo;
 import com.schedulerapp.model.UserDyspoDetails;
+import com.schedulerapp.repository.DyspoRepository;
 import com.schedulerapp.repository.UserDyspoDetailsRepository;
 import com.schedulerapp.repository.UserDyspoRepository;
 import com.schedulerapp.repository.UserRepository;
@@ -23,6 +25,9 @@ import java.util.LinkedHashMap;
 
 @Controller
 public class SummaryController {
+
+    @Autowired
+    private DyspoRepository dyspoRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -70,7 +75,7 @@ public class SummaryController {
                     .filter(dyspo -> dyspo.getDyspo() != null && dyspo.getDyspo().getDate() != null)
                     .collect(Collectors.groupingBy(dyspo -> dyspo.getDyspo().getDate(), Collectors.counting()));
 
-            List<LocalDate> allDates = generateCalendarDates(YearMonth.now());
+            List<LocalDate> allDates = generateCalendarDatesFromDyspo();
 
             Map<LocalDate, Long> calendarDyspoCounts = allDates.stream()
                     .collect(Collectors.toMap(
@@ -91,13 +96,13 @@ public class SummaryController {
                     .map(dyspo -> dyspo.getDyspo().getDate())
                     .collect(Collectors.toSet());
 
-            Map<LocalDate, Boolean> userDyspoCalendar = generateCalendarDates(YearMonth.now()).stream()
+            Map<LocalDate, Boolean> userDyspoCalendar = generateCalendarDatesFromDyspo().stream()
                     .collect(Collectors.toMap(date -> date, userDyspoDates::contains));
 
             model.addAttribute("userDyspoCalendar", userDyspoCalendar);
         }
 
-        int startDayOffset = calculateStartDayOffset(YearMonth.now());
+        int startDayOffset = calculateStartDayOffsetFromDyspo();
         model.addAttribute("startDayOffset", startDayOffset);
 
         return "summary";
@@ -112,8 +117,45 @@ public class SummaryController {
         model.addAttribute("userDetails", details);
     }
 
-    private List<LocalDate> generateCalendarDates(YearMonth yearMonth) {
+    private List<LocalDate> generateCalendarDatesFromDyspo() {
+        // Retrieve all dates from the Dyspo table
+        List<LocalDate> dyspoDates = dyspoRepository.findAll().stream()
+                .map(Dyspo::getDate)
+                .distinct()
+                .sorted()
+                .toList();
+
+        if (dyspoDates.isEmpty()) {
+            return List.of(); // Return an empty list if there are no dates
+        }
+
+        // Determine the minimum and maximum dates
+        LocalDate minDate = dyspoDates.get(0);
+        LocalDate maxDate = dyspoDates.get(dyspoDates.size() - 1);
+
+        // Use the year and month of the minimum date for the calendar
+        YearMonth yearMonth = YearMonth.of(minDate.getYear(), minDate.getMonth());
+
+        // Generate calendar dates for the month and year
         return yearMonth.atDay(1).datesUntil(yearMonth.atEndOfMonth().plusDays(1)).toList();
+    }
+
+    private int calculateStartDayOffsetFromDyspo() {
+        // Retrieve the earliest date from the Dyspo table
+        LocalDate earliestDate = dyspoRepository.findAll().stream()
+                .map(Dyspo::getDate)
+                .min(LocalDate::compareTo)
+                .orElse(null); // Return null if no dates exist
+
+        if (earliestDate == null) {
+            return 0; // Default offset if no dates exist
+        }
+
+        // Calculate the offset for the first day of the month of the earliest date
+        LocalDate firstDayOfMonth = earliestDate.withDayOfMonth(1);
+        int offset = (firstDayOfMonth.getDayOfWeek().getValue() % 7) - 1;
+
+        return offset < 0 ? 6 : offset;
     }
 
     private int calculateStartDayOffset(YearMonth yearMonth) {
