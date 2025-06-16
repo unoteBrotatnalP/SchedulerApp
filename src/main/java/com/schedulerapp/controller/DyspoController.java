@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -41,6 +40,9 @@ public class DyspoController {
 
     @Autowired
     private AdminSettingsRepository adminSettingsRepository;
+
+    @Autowired
+    private ArchivedDyspoRepository archivedDyspoRepository;
 
     @GetMapping("/dyspozycja")
     public String getDyspozycja(Model model, Authentication authentication) {

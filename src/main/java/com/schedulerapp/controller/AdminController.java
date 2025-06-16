@@ -2,6 +2,7 @@ package com.schedulerapp.controller;
 
 import com.schedulerapp.model.Dyspo;
 import com.schedulerapp.model.User;
+import com.schedulerapp.repository.ArchivedDyspoRepository;
 import com.schedulerapp.repository.DyspoRepository;
 import com.schedulerapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.schedulerapp.model.ArchivedDyspo;
+import com.schedulerapp.repository.ArchivedDyspoRepository;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -26,6 +33,9 @@ public class AdminController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ArchivedDyspoRepository archivedDyspoRepository;
 
     @GetMapping("/users")
     public String listUsers(Model model) {
@@ -115,9 +125,19 @@ public class AdminController {
     }
 
     @PostMapping("/generate-dyspo")
-    public String generateDyspo(@RequestParam int month, @RequestParam int year, Model model) {
+    public String generateDyspo(@RequestParam int month, @RequestParam int year, RedirectAttributes redirectAttributes) {
+        if (!dyspoRepository.findAll().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Generacja dyspozycji jest niemożliwa. Inna jest już aktywna");
+            return "redirect:/dyspozycja";
+        }
+
+        boolean existsInArchive = archivedDyspoRepository.existsByYearAndMonth(year, month);
+        if (existsInArchive) {
+            redirectAttributes.addFlashAttribute("error", "Generacja dyspozycji jest niemożliwa, dyspozycja już istnieje w archiwum.");
+            return "redirect:/dyspozycja";
+        }
+
         try {
-            // Logika generowania dyspozycji dla każdego dnia miesiąca
             LocalDate date = LocalDate.of(year, month, 1);
             int daysInMonth = date.lengthOfMonth();
 
@@ -126,11 +146,12 @@ public class AdminController {
                 dyspo.setDate(LocalDate.of(year, month, day));
                 dyspoRepository.save(dyspo);
             }
-            model.addAttribute("success", "Dyspozycje zostały wygenerowane.");
+            redirectAttributes.addFlashAttribute("success", "Dyspozycje zostały wygenerowane.");
         } catch (Exception e) {
-            model.addAttribute("error", "Wystąpił problem podczas generowania dyspozycji.");
+            redirectAttributes.addFlashAttribute("error", "Wystąpił problem podczas generowania dyspozycji.");
         }
 
         return "redirect:/dyspozycja";
     }
+
 }
