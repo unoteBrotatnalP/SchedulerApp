@@ -88,6 +88,11 @@
     <p>Brak dostępnych dyspozycji. Skorzystaj z panelu powyżej, aby je wygenerować.</p>
 </div>
 
+<!-- Wiadomości błędów -->
+<div th:if="${error}" style="color: red; margin-bottom: 10px;">
+    <p th:text="${error}"></p>
+</div>
+
 <!-- Kalendarz -->
 <div th:if="${!#lists.isEmpty(dyspoList)}" class="calendar-container">
     <!-- Pasek z dniami tygodnia -->

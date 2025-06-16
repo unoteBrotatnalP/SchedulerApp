@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 
 import java.time.DayOfWeek;
@@ -19,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+
 
 @Controller
 public class DyspoController {
@@ -34,6 +38,9 @@ public class DyspoController {
 
     @Autowired
     private UserDyspoDetailsRepository userDetailsRepository;
+
+    @Autowired
+    private AdminSettingsRepository adminSettingsRepository;
 
     @GetMapping("/dyspozycja")
     public String getDyspozycja(Model model, Authentication authentication) {
@@ -75,7 +82,15 @@ public class DyspoController {
     }
 
     @PostMapping("/dyspo/add")
-    public String addUserToDyspo(@RequestParam Long dyspoId, Authentication authentication) {
+    public String addUserToDyspo(@RequestParam Long dyspoId, Authentication authentication, RedirectAttributes redirectAttributes) {
+        AdminSettings settings = adminSettingsRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("AdminSettings not found"));
+
+        if (settings.isDyspoLocked()) {
+            redirectAttributes.addFlashAttribute("error", "Modyfikacja dyspozycji jest zablokowana.");
+            return "redirect:/dyspozycja";
+        }
+
         dyspoRepository.findById(dyspoId).ifPresent(dyspo -> {
             User user = userRepository.findByUsername(authentication.getName())
                     .orElseThrow(() -> new RuntimeException("User not found"));
@@ -94,21 +109,38 @@ public class DyspoController {
     }
 
     @PostMapping("/dyspo/remove")
-    public String removeUserFromDyspo(@RequestParam Long dyspoId, Authentication authentication) {
+    public String removeUserFromDyspo(@RequestParam Long dyspoId, Authentication authentication, RedirectAttributes redirectAttributes) {
+        AdminSettings settings = adminSettingsRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("AdminSettings not found"));
+
+        if (settings.isDyspoLocked()) {
+            redirectAttributes.addFlashAttribute("error", "Modyfikacja dyspozycji jest zablokowana.");
+            return "redirect:/dyspozycja";
+        }
+
         dyspoRepository.findById(dyspoId).ifPresent(dyspo -> {
             User user = userRepository.findByUsername(authentication.getName())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             userDyspoRepository.findByDyspoAndUser(dyspo, user)
                     .ifPresent(userDyspoRepository::delete);
-
         });
+
         return "redirect:/dyspozycja";
     }
 
 
+
     @PostMapping("/dyspo/add-hour")
-    public String setStartHour(@RequestParam Long dyspoId, @RequestParam String startHour, Authentication authentication) {
+    public String setStartHour(@RequestParam Long dyspoId, @RequestParam String startHour, Authentication authentication, RedirectAttributes redirectAttributes) {
+        AdminSettings settings = adminSettingsRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("AdminSettings not found"));
+
+        if (settings.isDyspoLocked()) {
+            redirectAttributes.addFlashAttribute("error", "Modyfikacja godzin jest zablokowana.");
+            return "redirect:/dyspozycja";
+        }
+
         dyspoRepository.findById(dyspoId).ifPresent(dyspo -> {
             User user = userRepository.findByUsername(authentication.getName())
                     .orElseThrow(() -> new RuntimeException("User not found"));
@@ -124,22 +156,31 @@ public class DyspoController {
             userDyspo.setStartHour(LocalTime.parse(startHour));
             userDyspoRepository.save(userDyspo);
         });
+
         return "redirect:/dyspozycja";
     }
+
 
     @PostMapping("/dyspo/details/save")
     public String saveDyspoDetails(
             @RequestParam int shiftCount,
             @RequestParam String preference,
             @RequestParam(required = false) boolean completed,
-            Authentication authentication) {
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
 
-        // Pobierz użytkownika
+        AdminSettings settings = adminSettingsRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("AdminSettings not found"));
+
+        if (settings.isDyspoLocked()) {
+            redirectAttributes.addFlashAttribute("error", "Edycja szczegółów dyspozycji jest zablokowana.");
+            return "redirect:/dyspozycja";
+        }
+
         String currentUsername = authentication.getName();
         User user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Pobierz lub stwórz nowe szczegóły dyspozycji
         UserDyspoDetails details = userDetailsRepository.findByUser(user)
                 .orElseGet(() -> {
                     UserDyspoDetails newDetails = new UserDyspoDetails();
@@ -147,17 +188,15 @@ public class DyspoController {
                     return newDetails;
                 });
 
-        // Zaktualizuj szczegóły
         details.setShiftCount(shiftCount);
         details.setPreference(Preference.valueOf(preference));
         details.setCompleted(completed);
 
-        // Zapisz do repozytorium
         userDetailsRepository.save(details);
 
-        // Przekieruj na stronę dyspozycji
         return "redirect:/dyspozycja";
     }
+
 
 
     @PostMapping("/admin/clear-dyspo")
