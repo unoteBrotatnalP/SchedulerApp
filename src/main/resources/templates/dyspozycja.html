@@ -98,10 +98,6 @@
     </div>
 </div>
 
-<!-- Informacja o braku dyspozycji -->
-<div th:if="${#lists.isEmpty(dyspoList)}">
-    <p>Brak dostępnych dyspozycji.</p>
-</div>
 
 <!-- Wiadomości błędów -->
 <div th:if="${error}" style="color: red; margin-bottom: 10px;">
@@ -109,6 +105,11 @@
 </div>
 
 <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+<!-- Informacja o braku dyspozycji -->
+<div th:if="${#lists.isEmpty(dyspoList)}">
+    <p>Brak dostępnych dyspozycji.</p>
+</div>
 
 <!-- Kalendarz -->
 <div th:if="${!#lists.isEmpty(dyspoList)}" class="calendar-container">

@@ -232,6 +232,7 @@ public class DyspoController {
 
     @PostMapping("/dyspo/archive")
     public String archiveDyspo(RedirectAttributes redirectAttributes) {
+        // Pobierz listę dyspozycji
         List<Dyspo> dyspoList = dyspoRepository.findAll();
 
         if (dyspoList.isEmpty()) {
@@ -239,6 +240,19 @@ public class DyspoController {
             return "redirect:/dyspozycja";
         }
 
+        // Sprawdź, czy istnieje już dyspozycja w archiwum dla tego miesiąca i roku
+        LocalDate firstDayOfMonth = dyspoList.get(0).getDate().withDayOfMonth(1);
+        int year = firstDayOfMonth.getYear();
+        int month = firstDayOfMonth.getMonthValue();
+
+        boolean alreadyArchived = archivedDyspoRepository.existsByYearAndMonth(year, month);
+
+        if (alreadyArchived) {
+            redirectAttributes.addFlashAttribute("error", "Dyspozycja jest już w archiwum.");
+            return "redirect:/dyspozycja";
+        }
+
+        // Archiwizacja
         for (Dyspo dyspo : dyspoList) {
             ArchivedDyspo archivedDyspo = new ArchivedDyspo();
             archivedDyspo.setDate(dyspo.getDate());
