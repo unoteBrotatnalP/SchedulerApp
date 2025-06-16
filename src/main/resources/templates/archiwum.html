@@ -15,13 +15,19 @@
     <thead>
     <tr>
         <th>Nazwa</th>
-        <th>Ilość wpisów</th>
+        <th>Akcja</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="summary : ${archiveSummaryList}">
         <td th:text="${summary.displayName}">dyspozycja 2025.07</td>
-        <td th:text="${summary.count}">30</td>
+        <td>
+            <form th:action="@{/archiwum/delete}" method="post" th:object="${summary}">
+                <input type="hidden" name="year" th:value="${summary.year}" />
+                <input type="hidden" name="month" th:value="${summary.month}" />
+                <button type="submit" onclick="return confirm('Czy na pewno chcesz usunąć archiwum?');">Usuń</button>
+            </form>
+        </td>
     </tr>
     </tbody>
 </table>
