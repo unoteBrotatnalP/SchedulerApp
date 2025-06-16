@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Archiwum dyspozycji</title>
     <link rel="stylesheet" href="/css/styles.css" />
 </head>
@@ -9,19 +9,19 @@
 
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<h1>Archiwum dyspozycji</h1>
+<h1>Archiwum dyspozycji (podsumowanie)</h1>
 
 <table border="1" cellpadding="5" cellspacing="0">
     <thead>
     <tr>
-        <th>ID</th>
-        <th>Data</th>
+        <th>Nazwa</th>
+        <th>Ilość wpisów</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="archived : ${archivedList}">
-        <td th:text="${archived.id}">1</td>
-        <td th:text="${archived.date}">2025-06-16</td>
+    <tr th:each="summary : ${archiveSummaryList}">
+        <td th:text="${summary.displayName}">dyspozycja 2025.07</td>
+        <td th:text="${summary.count}">30</td>
     </tr>
     </tbody>
 </table>
