@@ -145,6 +145,8 @@
 
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
+
+
 <div class="container">
     <h1>Podsumowanie Dyspozycji</h1>
 
@@ -220,9 +222,7 @@
             <button type="submit">Pokaż szczegóły</button>
         </form>
 
-        <div th:if="${user != null}">
-            <h3>Obecnie wybrany użytkownik:</h3>
-            <p><strong>Imię i nazwisko:</strong> <span th:text="${user.firstName + ' ' + user.lastName}"></span></p>
+
 
         <div th:if="${user != null}">
             <h3>Szczegóły użytkownika</h3>

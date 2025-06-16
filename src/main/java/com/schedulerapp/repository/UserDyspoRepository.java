@@ -13,4 +13,7 @@ public interface UserDyspoRepository extends JpaRepository<UserDyspo, Long> {
 
     // NOWA METODA:
     List<UserDyspo> findByUser(User user);
+
+    // Znajdowanie wszystkich UserDyspo dla danego Dyspo
+    List<UserDyspo> findByDyspo(Dyspo dyspo);
 }
