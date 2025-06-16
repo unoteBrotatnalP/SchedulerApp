@@ -44,6 +44,13 @@ public class DyspoController {
     @Autowired
     private ArchivedDyspoRepository archivedDyspoRepository;
 
+    @Autowired
+    private ArchivedUserDyspoRepository archivedUserDyspoRepository;
+
+    @Autowired
+    private ArchivedUserDyspoDetailsRepository archivedUserDyspoDetailsRepository;
+
+
     @GetMapping("/dyspozycja")
     public String getDyspozycja(Model model, Authentication authentication) {
         List<Dyspo> dyspoList = dyspoRepository.findAll();
@@ -79,6 +86,15 @@ public class DyspoController {
                     .orElse(new UserDyspoDetails());
             model.addAttribute("dyspoDetails", details);
         }
+
+        AdminSettings settings = adminSettingsRepository.findById(1L)
+                .orElseGet(() -> {
+                    AdminSettings s = new AdminSettings();
+                    s.setId(1L);
+                    s.setDyspoLocked(false);
+                    return adminSettingsRepository.save(s);
+                });
+        model.addAttribute("isDyspoLocked", settings.isDyspoLocked());
 
         return "dyspozycja";
     }
@@ -198,6 +214,60 @@ public class DyspoController {
 
         return "redirect:/dyspozycja";
     }
+
+    @PostMapping("/dyspo/toggle-lock")
+    public String toggleLock(RedirectAttributes redirectAttributes) {
+        AdminSettings settings = adminSettingsRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("AdminSettings not found"));
+
+        settings.setDyspoLocked(!settings.isDyspoLocked());
+        adminSettingsRepository.save(settings);
+
+        redirectAttributes.addFlashAttribute("success", settings.isDyspoLocked()
+                ? "Dyspozycja została zablokowana."
+                : "Dyspozycja została odblokowana.");
+
+        return "redirect:/dyspozycja";
+    }
+
+    @PostMapping("/dyspo/archive")
+    public String archiveDyspo(RedirectAttributes redirectAttributes) {
+        List<Dyspo> dyspoList = dyspoRepository.findAll();
+
+        if (dyspoList.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Nie ma żadnej dyspozycji do zapisania w archiwum.");
+            return "redirect:/dyspozycja";
+        }
+
+        for (Dyspo dyspo : dyspoList) {
+            ArchivedDyspo archivedDyspo = new ArchivedDyspo();
+            archivedDyspo.setDate(dyspo.getDate());
+            archivedDyspoRepository.save(archivedDyspo);
+
+            List<UserDyspo> userDyspoList = userDyspoRepository.findByDyspo(dyspo);
+            for (UserDyspo userDyspo : userDyspoList) {
+                ArchivedUserDyspo archivedUserDyspo = new ArchivedUserDyspo();
+                archivedUserDyspo.setArchivedDyspo(archivedDyspo);
+                archivedUserDyspo.setUser(userDyspo.getUser());
+                archivedUserDyspo.setStartHour(userDyspo.getStartHour());
+                archivedUserDyspoRepository.save(archivedUserDyspo);
+            }
+        }
+
+        List<UserDyspoDetails> userDetailsList = userDetailsRepository.findAll();
+        for (UserDyspoDetails details : userDetailsList) {
+            ArchivedUserDyspoDetails archivedDetails = new ArchivedUserDyspoDetails();
+            archivedDetails.setUser(details.getUser());
+            archivedDetails.setShiftCount(details.getShiftCount());
+            archivedDetails.setPreference(details.getPreference());
+            archivedDetails.setCompleted(details.getCompleted());
+            archivedUserDyspoDetailsRepository.save(archivedDetails);
+        }
+
+        redirectAttributes.addFlashAttribute("success", "Obecna dyspozycja została zapisana do archiwum.");
+        return "redirect:/dyspozycja";
+    }
+
 
 
 

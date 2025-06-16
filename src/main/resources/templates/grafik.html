@@ -11,24 +11,6 @@
 
 <h1>Grafik</h1>
 
-<div th:if="${isAdmin}">
-    <!-- Formularz do blokowania dyspozycji -->
-    <form th:action="@{/grafik/toggle-lock}" method="post">
-        <label>
-            <input type="checkbox" name="lock" th:checked="${isDyspoLocked}" onchange="this.form.submit()" />
-            Zablokuj dyspozycję
-        </label>
-    </form>
-
-    <!-- Formularz do archiwizacji -->
-    <form th:action="@{/grafik/archive-dyspo}" method="post" style="margin-top: 20px;">
-        <button type="submit" class="btn btn-primary">Zapisz obecną dyspozycję do archiwum</button>
-    </form>
-</div>
-
-<!-- Wyświetlenie komunikatu o błędzie lub sukcesie -->
-<div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-<div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
 <a href="/">Home</a>
 
