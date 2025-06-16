@@ -59,7 +59,8 @@ public class SummaryController {
                     return details != null && Boolean.TRUE.equals(details.getCompleted());
                 }).count();
 
-        double dyspoPercentage = totalUsers > 0 ? (usersWithCompleted * 100.0 / totalUsers) : 0;
+        int dyspoPercentage = totalUsers > 0 ? (int) Math.round(usersWithCompleted * 100.0 / totalUsers) : 0;
+
         model.addAttribute("dyspoPercentage", dyspoPercentage);
 
         if (isAdmin) {

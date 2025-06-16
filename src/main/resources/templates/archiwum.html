@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Archiwum dyspozycji</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<h1>Archiwum dyspozycji</h1>
+
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Data</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="archived : ${archivedList}">
+        <td th:text="${archived.id}">1</td>
+        <td th:text="${archived.date}">2025-06-16</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -22,6 +22,10 @@
             <a th:href="@{/admin/users}">Panel użytkowników</a>
         </li>
 
+        <li th:if="${#authorization != null and #authorization.expression('hasRole(''ADMIN'')')}">
+            <a th:href="@{/archiwum}">Archwium</a>
+        </li>
+
 
 
     </ul>
