@@ -20,6 +20,10 @@ public class ArchivedUserDyspoDetails {
 
     private Boolean completed;
 
+    @ManyToOne
+    @JoinColumn(name = "archived_dyspo_id", nullable = false)
+    private ArchivedDyspo archivedDyspo;
+
     // Gettery i Settery
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -35,4 +39,7 @@ public class ArchivedUserDyspoDetails {
 
     public Boolean getCompleted() { return completed; }
     public void setCompleted(Boolean completed) { this.completed = completed; }
+
+    public ArchivedDyspo getArchivedDyspo() { return archivedDyspo; }
+    public void setArchivedDyspo(ArchivedDyspo archivedDyspo) { this.archivedDyspo = archivedDyspo; }
 }

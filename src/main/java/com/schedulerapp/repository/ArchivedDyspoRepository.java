@@ -21,4 +21,7 @@ public interface ArchivedDyspoRepository extends JpaRepository<ArchivedDyspo, Lo
     @Transactional
     @Query(value = "DELETE FROM archived_dyspo WHERE YEAR(date) = :year AND MONTH(date) = :month", nativeQuery = true)
     void deleteByYearAndMonth(@Param("year") int year, @Param("month") int month);
+
+    @Query("SELECT a FROM ArchivedDyspo a ORDER BY a.date DESC")
+    ArchivedDyspo findTopByOrderByDateDesc();
 }

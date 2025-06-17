@@ -252,12 +252,16 @@ public class DyspoController {
             return "redirect:/dyspozycja";
         }
 
-        // Archiwizacja
+        // Archiwizacja dyspozycji i użytkowników
+        ArchivedDyspo archivedDyspo = null;
+
         for (Dyspo dyspo : dyspoList) {
-            ArchivedDyspo archivedDyspo = new ArchivedDyspo();
+            // Tworzenie archiwalnej dyspozycji
+            archivedDyspo = new ArchivedDyspo();
             archivedDyspo.setDate(dyspo.getDate());
             archivedDyspoRepository.save(archivedDyspo);
 
+            // Pobieranie użytkowników powiązanych z dyspozycją
             List<UserDyspo> userDyspoList = userDyspoRepository.findByDyspo(dyspo);
             for (UserDyspo userDyspo : userDyspoList) {
                 ArchivedUserDyspo archivedUserDyspo = new ArchivedUserDyspo();
@@ -268,6 +272,7 @@ public class DyspoController {
             }
         }
 
+        // Archiwizacja szczegółów użytkowników
         List<UserDyspoDetails> userDetailsList = userDetailsRepository.findAll();
         for (UserDyspoDetails details : userDetailsList) {
             ArchivedUserDyspoDetails archivedDetails = new ArchivedUserDyspoDetails();
@@ -275,13 +280,18 @@ public class DyspoController {
             archivedDetails.setShiftCount(details.getShiftCount());
             archivedDetails.setPreference(details.getPreference());
             archivedDetails.setCompleted(details.getCompleted());
+
+            // Powiązanie z archiwalną dyspozycją
+            if (archivedDyspo != null) {
+                archivedDetails.setArchivedDyspo(archivedDyspo);
+            }
+
             archivedUserDyspoDetailsRepository.save(archivedDetails);
         }
 
         redirectAttributes.addFlashAttribute("success", "Obecna dyspozycja została zapisana do archiwum.");
         return "redirect:/dyspozycja";
     }
-
 
 
 

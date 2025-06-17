@@ -13,7 +13,11 @@ public interface ArchivedUserDyspoDetailsRepository extends JpaRepository<Archiv
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE audd FROM archived_user_dyspo_details audd WHERE audd.user_id IN (SELECT DISTINCT aud.user_id FROM archived_user_dyspo aud JOIN archived_dyspo ad ON aud.archived_dyspo_id = ad.id WHERE YEAR(ad.date) = :year AND MONTH(ad.date) = :month)", nativeQuery = true)
+    @Query(value = "DELETE FROM archived_user_dyspo_details audd " +
+            "WHERE audd.archived_dyspo_id IN (" +
+            "  SELECT ad.id FROM archived_dyspo ad " +
+            "  WHERE YEAR(ad.date) = :year AND MONTH(ad.date) = :month" +
+            ")", nativeQuery = true)
     void deleteByYearAndMonth(@Param("year") int year, @Param("month") int month);
 
 }
