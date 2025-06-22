@@ -26,6 +26,10 @@
             <a th:href="@{/archiwum}">Archwium</a>
         </li>
 
+        <li th:if="${#authorization != null and #authorization.expression('hasRole(''ADMIN'')')}">
+            <a th:href="@{/adminsettings}">Ustawienia Grafiku</a>
+        </li>
+
 
 
     </ul>

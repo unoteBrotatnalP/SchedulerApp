@@ -22,7 +22,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/", "/grafik", "/dyspozycja", "/summary", "/archiwum").authenticated()
+                .requestMatchers("/", "/grafik", "/dyspozycja", "/summary", "/archiwum", "/admin/users", "/adminsettings").authenticated()
                 .anyRequest().permitAll()
                 .and()
                 .formLogin()
