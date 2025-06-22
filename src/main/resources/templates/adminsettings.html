@@ -10,6 +10,61 @@
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <h1>Ustawienia Grafiku</h1>
+
+<h2>Zmiany Tygodniowe</h2>
+<table border="1">
+  <thead>
+  <tr>
+    <th>Godzina</th>
+    <th>Akcje</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="shift : ${weekdayShifts}">
+    <td th:text="${shift.hour}">16:00</td>
+    <td>
+      <form th:action="@{/adminsettings/delete}" method="post">
+        <input type="hidden" name="id" th:value="${shift.id}" />
+        <button type="submit">Usuń</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<h2>Zmiany Weekendowe</h2>
+<table border="1">
+  <thead>
+  <tr>
+    <th>Godzina</th>
+    <th>Akcje</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="shift : ${weekendShifts}">
+    <td th:text="${shift.hour}">16:00</td>
+    <td>
+      <form th:action="@{/adminsettings/delete}" method="post">
+        <input type="hidden" name="id" th:value="${shift.id}" />
+        <button type="submit">Usuń</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<h2>Dodaj Nową Zmianę</h2>
+<form th:action="@{/adminsettings/add}" method="post">
+  <label for="hour">Godzina:</label>
+  <input type="time" id="hour" name="hour" required>
+  <label for="type">Typ:</label>
+  <select id="type" name="type">
+    <option value="WEEKDAY">Tygodniowa</option>
+    <option value="WEEKEND">Weekendowa</option>
+  </select>
+  <button type="submit">Dodaj</button>
+</form>
+
 <button onclick="window.location.href='/'">Powrót</button>
 
 </body>
