@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Controller
 @RequestMapping("/adminsettings")
 public class AdminSettingsController {
@@ -20,7 +22,12 @@ public class AdminSettingsController {
     public String getShiftHours(Model model) {
         model.addAttribute("weekdayShifts", shiftHoursRepository.findByType(ShiftType.WEEKDAY));
         model.addAttribute("weekendShifts", shiftHoursRepository.findByType(ShiftType.WEEKEND));
-        model.addAttribute("shiftChangeOptions", ShiftChange.values());
+        Map<String, String> shiftChangeOptions = Map.of(
+                "NONE", "Brak",
+                "OPENING", "Otwarcie",
+                "CLOSING", "Zamknięcie"
+        );
+        model.addAttribute("shiftChangeOptions", shiftChangeOptions);
         return "adminsettings";
     }
 
