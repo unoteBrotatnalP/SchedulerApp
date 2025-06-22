@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ustawienia Grafiku</title>
+  <script>
+    function toggleEditForm(rowId) {
+      const form = document.getElementById(`edit-form-${rowId}`);
+      const isHidden = form.style.display === "none";
+      form.style.display = isHidden ? "block" : "none";
+    }
+  </script>
+
 </head>
 <body>
 
@@ -21,24 +29,29 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:each="shift : ${weekdayShifts}">
+  <tr th:each="shift, iter : ${weekdayShifts}">
     <td th:text="${shift.hour}">16:00</td>
     <td th:text="${shift.shiftChange.displayName}">Brak</td>
     <td>
+      <button onclick="toggleEditForm('weekday-[[${iter.index}]]')">Edycja</button>
       <form th:action="@{/adminsettings/delete}" method="post" style="display:inline;">
         <input type="hidden" name="id" th:value="${shift.id}" />
         <button type="submit">Usuń</button>
       </form>
-      <form th:action="@{/adminsettings/edit}" method="post" style="display:inline;">
-        <input type="hidden" name="id" th:value="${shift.id}" />
-        <input type="time" name="hour" th:value="${shift.hour}" required>
-        <select name="shiftChange">
-          <option th:each="entry : ${shiftChangeOptions}"
-                  th:value="${entry.key}"
-                  th:text="${entry.value}"></option>
-        </select>
-        <button type="submit">Zapisz</button>
-      </form>
+      <div id="edit-form-weekday-[[${iter.index}]]" style="display:none; margin-top: 10px;">
+        <form th:action="@{/adminsettings/edit}" method="post">
+          <input type="hidden" name="id" th:value="${shift.id}" />
+          <label>Godzina:</label>
+          <input type="time" name="hour" th:value="${shift.hour}" required>
+          <label>Typ Zmiany:</label>
+          <select name="shiftChange">
+            <option th:each="entry : ${shiftChangeOptions}"
+                    th:value="${entry.key}"
+                    th:text="${entry.value}"></option>
+          </select>
+          <button type="submit">Zapisz</button>
+        </form>
+      </div>
     </td>
   </tr>
   </tbody>
@@ -54,24 +67,29 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:each="shift : ${weekendShifts}">
+  <tr th:each="shift, iter : ${weekendShifts}">
     <td th:text="${shift.hour}">16:00</td>
     <td th:text="${shift.shiftChange.displayName}">Brak</td>
     <td>
+      <button onclick="toggleEditForm('weekend-[[${iter.index}]]')">Edycja</button>
       <form th:action="@{/adminsettings/delete}" method="post" style="display:inline;">
         <input type="hidden" name="id" th:value="${shift.id}" />
         <button type="submit">Usuń</button>
       </form>
-      <form th:action="@{/adminsettings/edit}" method="post" style="display:inline;">
-        <input type="hidden" name="id" th:value="${shift.id}" />
-        <input type="time" name="hour" th:value="${shift.hour}" required>
-        <select name="shiftChange">
-          <option th:each="entry : ${shiftChangeOptions}"
-                  th:value="${entry.key}"
-                  th:text="${entry.value}"></option>
-        </select>
-        <button type="submit">Zapisz</button>
-      </form>
+      <div id="edit-form-weekend-[[${iter.index}]]" style="display:none; margin-top: 10px;">
+        <form th:action="@{/adminsettings/edit}" method="post">
+          <input type="hidden" name="id" th:value="${shift.id}" />
+          <label>Godzina:</label>
+          <input type="time" name="hour" th:value="${shift.hour}" required>
+          <label>Typ Zmiany:</label>
+          <select name="shiftChange">
+            <option th:each="entry : ${shiftChangeOptions}"
+                    th:value="${entry.key}"
+                    th:text="${entry.value}"></option>
+          </select>
+          <button type="submit">Zapisz</button>
+        </form>
+      </div>
     </td>
   </tr>
   </tbody>
