@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
+  <title>Ustawienia Grafiku</title>
 </head>
 <body>
 
@@ -16,16 +16,26 @@
   <thead>
   <tr>
     <th>Godzina</th>
+    <th>Typ Zmiany</th>
     <th>Akcje</th>
   </tr>
   </thead>
   <tbody>
   <tr th:each="shift : ${weekdayShifts}">
     <td th:text="${shift.hour}">16:00</td>
+    <td th:text="${shift.shiftChange}">Brak</td>
     <td>
-      <form th:action="@{/adminsettings/delete}" method="post">
+      <form th:action="@{/adminsettings/delete}" method="post" style="display:inline;">
         <input type="hidden" name="id" th:value="${shift.id}" />
         <button type="submit">Usuń</button>
+      </form>
+      <form th:action="@{/adminsettings/edit}" method="post" style="display:inline;">
+        <input type="hidden" name="id" th:value="${shift.id}" />
+        <input type="time" name="hour" th:value="${shift.hour}" required>
+        <select name="shiftChange" th:value="${shift.shiftChange}">
+          <option th:each="change : ${shiftChangeOptions}" th:value="${change}" th:text="${change}"></option>
+        </select>
+        <button type="submit">Zapisz</button>
       </form>
     </td>
   </tr>
@@ -37,16 +47,26 @@
   <thead>
   <tr>
     <th>Godzina</th>
+    <th>Typ Zmiany</th>
     <th>Akcje</th>
   </tr>
   </thead>
   <tbody>
   <tr th:each="shift : ${weekendShifts}">
     <td th:text="${shift.hour}">16:00</td>
+    <td th:text="${shift.shiftChange}">Brak</td>
     <td>
-      <form th:action="@{/adminsettings/delete}" method="post">
+      <form th:action="@{/adminsettings/delete}" method="post" style="display:inline;">
         <input type="hidden" name="id" th:value="${shift.id}" />
         <button type="submit">Usuń</button>
+      </form>
+      <form th:action="@{/adminsettings/edit}" method="post" style="display:inline;">
+        <input type="hidden" name="id" th:value="${shift.id}" />
+        <input type="time" name="hour" th:value="${shift.hour}" required>
+        <select name="shiftChange" th:value="${shift.shiftChange}">
+          <option th:each="change : ${shiftChangeOptions}" th:value="${change}" th:text="${change}"></option>
+        </select>
+        <button type="submit">Zapisz</button>
       </form>
     </td>
   </tr>
@@ -61,6 +81,12 @@
   <select id="type" name="type">
     <option value="WEEKDAY">Tygodniowa</option>
     <option value="WEEKEND">Weekendowa</option>
+  </select>
+  <label for="shiftChange">Typ Zmiany:</label>
+  <select id="shiftChange" name="shiftChange">
+    <option value="NONE">Brak</option>
+    <option value="OPENING">Otwarcie</option>
+    <option value="CLOSING">Zamknięcie</option>
   </select>
   <button type="submit">Dodaj</button>
 </form>

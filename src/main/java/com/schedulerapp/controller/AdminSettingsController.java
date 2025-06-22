@@ -1,5 +1,6 @@
 package com.schedulerapp.controller;
 
+import com.schedulerapp.model.ShiftChange;
 import com.schedulerapp.model.ShiftHours;
 import com.schedulerapp.model.ShiftType;
 import com.schedulerapp.repository.ShiftHoursRepository;
@@ -19,14 +20,16 @@ public class AdminSettingsController {
     public String getShiftHours(Model model) {
         model.addAttribute("weekdayShifts", shiftHoursRepository.findByType(ShiftType.WEEKDAY));
         model.addAttribute("weekendShifts", shiftHoursRepository.findByType(ShiftType.WEEKEND));
+        model.addAttribute("shiftChangeOptions", ShiftChange.values());
         return "adminsettings";
     }
 
     @PostMapping("/add")
-    public String addShift(@RequestParam String hour, @RequestParam String type) {
+    public String addShift(@RequestParam String hour, @RequestParam String type, @RequestParam String shiftChange) {
         ShiftHours shift = new ShiftHours();
         shift.setHour(hour);
         shift.setType(ShiftType.valueOf(type.toUpperCase()));
+        shift.setShiftChange(ShiftChange.valueOf(shiftChange.toUpperCase()));
         shiftHoursRepository.save(shift);
         return "redirect:/adminsettings";
     }
@@ -34,6 +37,15 @@ public class AdminSettingsController {
     @PostMapping("/delete")
     public String deleteShift(@RequestParam Long id) {
         shiftHoursRepository.deleteById(id);
+        return "redirect:/adminsettings";
+    }
+
+    @PostMapping("/edit")
+    public String editShift(@RequestParam Long id, @RequestParam String hour, @RequestParam String shiftChange) {
+        ShiftHours shift = shiftHoursRepository.findById(id).orElseThrow();
+        shift.setHour(hour);
+        shift.setShiftChange(ShiftChange.valueOf(shiftChange.toUpperCase()));
+        shiftHoursRepository.save(shift);
         return "redirect:/adminsettings";
     }
 }

@@ -14,6 +14,9 @@ public class ShiftHours {
     @Enumerated(EnumType.STRING)
     private ShiftType type; // Wartości: WEEKDAY lub WEEKEND
 
+    @Enumerated(EnumType.STRING)
+    private ShiftChange shiftChange; // Nowa kolumna
+
     // Gettery i settery
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -23,4 +26,7 @@ public class ShiftHours {
 
     public ShiftType getType() { return type; }
     public void setType(ShiftType type) { this.type = type; }
+
+    public ShiftChange getShiftChange() { return shiftChange; }
+    public void setShiftChange(ShiftChange shiftChange) { this.shiftChange = shiftChange; }
 }
